@@ -1,23 +1,32 @@
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
 void osszeg(int tomb[], int meret);
 void max(int tomb[], int meret);
 void min(int tomb[], int meret);
 int maximum(int tomb[], int index, int len);
 int minimum(int tomb[], int index, int len);
-#define MAX_SIZE 100
+
 int main() {
-    int tomb[MAX_SIZE];
+    
     int meret;
 
     printf("Add meg a tomb meretet: ");
     scanf("%d", &meret);
-    printf("Adj meg %d db elemet: ", meret);
+    int tomb[meret];
+    srand(time(NULL));
     for(int i = 0; i < meret; i++)
     {
-        scanf("%d", &tomb[i]);
+        tomb[i] = (rand() % (10000 - 10 + 1)) + 10;
     }
+    for (int j = 0; j < meret; j++)
+    {
+        printf("%d ",tomb[j]);
+    }
+
+    printf("\n");
+    
 
     
     int maximum_rekurziv;
@@ -26,24 +35,35 @@ int main() {
 
     osszeg(tomb,meret);
     clock_t begin_linear = clock();
+    sleep(3);
     max(tomb,meret);
     min(tomb,meret);
     clock_t end_linear = clock();
 
 
     clock_t begin_recursive = clock();
+    sleep(5);
     maximum_rekurziv = maximum(tomb,0,meret);
-    printf("A legnagyobb elem rekurzivan: %d\n", maximum_rekurziv);
+    
 
     minimum_rekurziv = minimum(tomb,0,meret);
-    printf("A legkisebb elem rekurzivan: %d\n", minimum_rekurziv);
+    
     clock_t end_recursive = clock();
+    printf("A legnagyobb elem rekurzivan: %d\n", maximum_rekurziv);
+    printf("A legkisebb elem rekurzivan: %d\n", minimum_rekurziv);
+
 
     double time_spent_linear = (double)(end_linear - begin_linear) / CLOCKS_PER_SEC;
-    printf("A lineáris keresés ideje: %lf masodperc",time_spent_linear);
+    printf("A linearis kereses ideje: %lf masodperc\n",time_spent_linear * 1000);
 
     double time_spent_rec = (double)(end_recursive - begin_recursive) / CLOCKS_PER_SEC;
-    printf("A rekurziv keresés ideje: %lf masodperc",time_spent_rec);
+    printf("A rekurziv kereses ideje: %lf masodperc",time_spent_rec * 1000);
+
+    FILE *fp;
+    fp = fopen("adatok.csv","w");
+    fprintf(fp,"%d %lf \n%d %lf ",meret,time_spent_linear,meret,time_spent_rec);
+    fclose(fp);
+
 
    return 0;
 }
