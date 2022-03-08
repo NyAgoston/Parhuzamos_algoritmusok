@@ -1,11 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h> 
 #include <pthread.h>
 #include <time.h>
-
 #define MERET 1000000
 
-void *paros_paratlan(int* tomb){
+static int* tomb;
+
+void tomb_feltoltes();
+
+void *sum(void * vargp)
+{
+	int sum = 0;
+    for (int i = 0; i < MERET; i++)
+    {
+        sum += tomb[i];
+    }
+    printf("A tomb osszege: %d\n",sum);
+    
+	return NULL;
+}
+void *parosparatlan(void *vargp){
     int paros = 0;
     int paratlan = 0;
     for (int i = 0; i < MERET; i++)
@@ -21,7 +36,7 @@ void *paros_paratlan(int* tomb){
     printf("Paratlan elemek szama: %d\n",paratlan);
     return NULL;
 }
-void *zeros(int* tomb){
+void *zeros(void *vargp){
     int zeros = 0;
     
     for (int i = 0; i < MERET; i++)
@@ -34,7 +49,7 @@ void *zeros(int* tomb){
     printf("Nullak szama: %d\n",zeros);
     return NULL;
 }
-void *negativ(int* tomb){
+void *negativ(void *vargp){
     int negativ = 0;
     
     for (int i = 0; i < MERET; i++)
@@ -44,64 +59,81 @@ void *negativ(int* tomb){
         }
         
     }
-    printf("negativ elemek szama: %d\n",zeros);
+    printf("negativ elemek szama: %d\n",negativ);
     return NULL;
 }
-void *intervallum(int* tomb){
+void *intervallum(void *vargp){
     int intervallum = 0;
     
     for (int i = 0; i < MERET; i++)
     {
-        if(tomb[i] < 50 & tomb[i] > 30){
+        if(tomb[i] < -100 & tomb[i] > 100){
             intervallum += 1;
         }
         
     }
-    printf("30 es 40 koze eso elemek szama: %d\n",intervallum);
+    printf("-100 es 100 koze eso elemek szama: %d\n",intervallum);
     return NULL;
 }
-int main(){
-    int* tomb;
-    int seged;
-    int random;
 
-    tomb = (signed int*) malloc(MERET * sizeof(signed int));
+int main()
+{
 
     srand(time(NULL));
+    tomb = (signed int*) malloc(MERET * sizeof(signed int));
 
-    for (int i = 0; i < MERET; i++)
-    {
-        tomb[i] = rand()%1000 + 1;
-        int seged = rand()%2;
-        if(seged == 0){
-            tomb[i] *= -1;
-        }
-    }
+    tomb_feltoltes();
+    
 
-    printf("\n");
+	pthread_t summa;
+    pthread_t paros_paratlan;
+    pthread_t nullak;
+    pthread_t negativ_szamok;
+    pthread_t intervallumon_belul;
 
-    pthread_t elso_id;
-    pthread_t masodik_id;
-    pthread_t harmadik_id;
-    pthread_t negyedik_id;
+
+	printf("Before Thread\n");
 
     clock_t start, end;
     double cpu_time_taken;
     start = clock();
 
-    pthread_create(&elso_id, NULL, paros_paratlan(tomb), NULL);
-    pthread_create(&masodik_id, NULL, zeros(tomb), NULL);
-    pthread_create(&harmadik_id, NULL, negativ(tomb), NULL);
-    pthread_create(&negyedik_id, NULL, intervallum(tomb), NULL);
-    pthread_join(elso_id, NULL);
-    pthread_join(masodik_id, NULL);
-    pthread_join(harmadik_id, NULL);
-    pthread_join(negyedik_id, NULL);
-    printf("Muvelet befejezve!");
+	pthread_create(&summa, NULL, sum, NULL);
+    pthread_create(&paros_paratlan, NULL, parosparatlan, NULL);
+    pthread_create(&nullak, NULL, zeros, NULL);
+    pthread_create(&negativ_szamok, NULL, negativ, NULL);
+    pthread_create(&intervallumon_belul, NULL, intervallum, NULL);
+
+	pthread_join(summa, NULL);
+    pthread_join(paros_paratlan, NULL);
+    pthread_join(nullak, NULL);
+    pthread_join(negativ_szamok, NULL);
+    pthread_join(intervallumon_belul, NULL);
 
     end = clock();
     cpu_time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
-    printf("Eltelt ido: %lf",cpu_time_taken); 
+    printf("Eltelt ido: %lf\n",cpu_time_taken); 
 
-    exit(0);
+	printf("After Thread\n");
+
+    FILE *fp;
+    fp = fopen("ketto_pthread.csv","a");
+    fprintf(fp,"%d %lf\n",MERET,cpu_time_taken);
+    fclose(fp);
+
+	exit(0);
+}
+
+void tomb_feltoltes(){
+    for (int i = 0; i < MERET; i++)
+    {
+        tomb[i] = rand()%500 + 1;
+        int seged = rand()%2;
+        if(seged == 0){
+            tomb[i] *= -1;
+        }
+    
+        //printf("%d ",tomb[i]);
+    }
+    printf("\n");
 }

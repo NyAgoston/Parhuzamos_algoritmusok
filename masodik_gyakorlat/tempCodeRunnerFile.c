@@ -1,1 +1,4 @@
-int elem = (rand() % (10000 - 10 + 1)) + 10;
+ FILE *fp;
+    fp = fopen("adatok.csv","w");
+    fprintf(fp,"%d %lf \n%d %lf ",meret,time_spent_linear,meret,time_spent_rec);
+    fclose(fp);

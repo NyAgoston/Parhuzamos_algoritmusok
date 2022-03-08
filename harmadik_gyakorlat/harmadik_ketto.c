@@ -25,7 +25,7 @@ int main(){
             tomb[i] *= -1;
         }
     
-        printf("%d ",tomb[i]);
+        //printf("%d ",tomb[i]);
     }
 
     printf("\n");
@@ -40,6 +40,11 @@ int main(){
     end = clock();
     cpu_time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
     printf("Eltelt ido: %lf",cpu_time_taken);
+
+    FILE *fp;
+    fp = fopen("ketto_sima.csv","a");
+    fprintf(fp,"%d %lf\n",MERET,cpu_time_taken);
+    fclose(fp);
     
     return 0; 
 }
