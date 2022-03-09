@@ -2,6 +2,7 @@ import csv
 from operator import delitem
 from matplotlib import pyplot as plt
 
+
 with open("ketto_sima.csv","r") as csv_file:
     
     reader = csv.reader(csv_file,delimiter = " ")
