@@ -1,107 +1,98 @@
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
-#define MERET 8
-void prefix(int tomb[]);
-void crew_prefix(int tomb[]);
-void erew_prefix(int tomb[]);
+#include <time.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <pthread.h>
 
-int main(){
-
-    int tomb[MERET];
-    srand(time(NULL));
-
-    for (int i = 0; i < MERET; i++)
-    {
-        tomb[i] = rand() % 100 + 1;
-        printf("%d ",tomb[i]);
-    }
-    
-    printf("\n");
-    printf("Sima: ");
-    
-    prefix(tomb);
-
-    printf("\n");
-    printf("Crew_prefix: ");
-
-    crew_prefix(tomb);
-
-    printf("\n");
-    printf("Erew_prefix: ");
-
-    erew_prefix(tomb);
+#define N 10
+#define THREADNUMBER 10
 
 
-    return 0;
+void listarray(int* array){
+	int i;
+	for(i=0;i<N;i++){
+		printf("%d ",array[i]);
+	}
+	printf("\n");
 }
 
-void prefix(int tomb[]){
-    int osszeg = tomb[0];
-    int tomb2[MERET];
-    tomb2[0] = osszeg;
-
-    for (int j = 1; j < MERET; j++)
-    {
-        osszeg += tomb[j];
-        tomb2[j] = osszeg;
-    }
-
-    for (int i = 0; i < MERET; i++)
-    {
-        printf("%d ",tomb2[i]);
-    }
+int szekv(int* array){
+	int sum=0;
+	int i;
+	
+	for(i=0;i<N;i++){
+		sum+=array[i];
+	}
+	return sum;
 }
-void crew_prefix(int tomb[]){
-    int tomb2[MERET];
-    int elso = MERET / 2;
-    tomb2[0] = tomb[0];
-    int osszeg = tomb[0];
-    for (int j = 1; j < elso; j++)
-    {
-        osszeg += tomb[j];
-        tomb2[j] = osszeg;
-    }
-    tomb2[elso] = tomb[elso];
-    osszeg = tomb[elso];
-    for (int i = elso + 1; i < MERET; i++)
-    {
-        osszeg += tomb[i];
-        tomb2[i] = osszeg;
-    }
-    for (int i = elso; i < MERET; i++)
-    {
-        tomb2[i] += tomb2[elso - 1];
-    }
-       
-    for (int k = 0; k < MERET; k++)
-    {
-        printf("%d ",tomb2[k]);
-    }
-     
-}
-void erew_prefix(int tomb[]){
-    int tomb2[MERET];
-    tomb2[0] = tomb[0];
-    for (int i = 1; i < MERET; i++)
-    {
-        tomb2[i] = tomb[i - 1] + tomb[i];
-    }
-    int k = 1;
-    while (k < MERET)
-    {
-        for (int i = k + 1; i < MERET; i++)
-        {
-            tomb2[i] = tomb2[i - k] + tomb2[i];
-        }
-        k *= 2;
-        
-    }
-    for (int k = 0; k < MERET; k++)
-    {
-        printf("%d ",tomb2[k]);
-    }
-    
-    
 
+void crew_prefix(int* array,int* crewarray,int a, int b){
+	int i,k;
+	
+	if(a==b){
+		crewarray[a]=array[a];
+		return ;
+	}else{
+		k=(a+b)/2;
+		crew_prefix(array,crewarray,a,k);
+		crew_prefix(array,crewarray,k+1,b);
+		for(i=k+1;i<=b;i++){
+			crewarray[i]+=crewarray[k];
+		}
+	}
+}
+
+void erew_prefix(int* array,int* erewarray){
+	int i,k;
+	
+	erewarray[0]=array[0];
+	for(i=1;i<N;i++){
+		erewarray[i]=array[i-1]+array[i];
+	}
+	listarray(erewarray);
+	k=2;
+	while(k<N){
+		for(i=k;i<N;i++){
+			erewarray[i]=erewarray[i-k]+erewarray[i];
+		}
+		printf("k: %d \n",k);
+		listarray(erewarray);
+		k*=2;
+	}
+}
+
+void load(int* array){
+	int i;
+	
+	for(i=0;i<N;i++){
+		array[i]=rand()%20;
+	}
+}
+
+void copyarray(int* array,int* carray){
+	int i;
+	
+	for(i=0;i<N;i++){
+		carray[i]=carray[i];
+	}
+}
+
+
+int main(int argc, char* argv[])
+{
+	int array[N],crewarray[N],erewarray[N];
+	int i;
+	
+	//copyarray(array,crewarray);
+	srand(time(NULL));
+	
+	load(array);
+	printf("szekv: %d\n",szekv(array));
+	listarray(array);
+	crew_prefix(array,crewarray,0,N-1);
+	listarray(crewarray);
+	erew_prefix(array,erewarray);
+	listarray(erewarray);
+	return 0;
 }
