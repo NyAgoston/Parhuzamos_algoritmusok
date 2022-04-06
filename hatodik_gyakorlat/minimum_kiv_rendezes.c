@@ -1,4 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <pthread.h>
+
+#define MERET 100
+
+typedef struct arg_data {
+    int thread_number;
+} arg_data;
 
 void swap(int *xp, int *yp)
 {
@@ -14,11 +23,15 @@ void selectionSort(int arr[], int n)
 	
 	for (i = 0; i < n-1; i++)
 	{
+
+
 		
 		min_idx = i;
 		for (j = i+1; j < n; j++)
-		if (arr[j] < arr[min_idx])
+		if (arr[j] < arr[min_idx]){
 			min_idx = j;
+		}
+			
 
 		swap(&arr[min_idx], &arr[i]);
 	}
@@ -36,10 +49,17 @@ void printArray(int arr[], int size)
 
 int main()
 {
-	int arr[] = {64, 25, 12, 22, 11};
-	int n = sizeof(arr)/sizeof(arr[0]);
-	selectionSort(arr, n);
+	int arr[MERET];
+
+	srand(time(NULL));
+
+	for (int i = 0; i < MERET; i++)
+	{
+		arr[i] = rand() % 100;
+	}
+		
+	selectionSort(arr, MERET);
 	printf("Sorted array: \n");
-	printArray(arr, n);
+	printArray(arr, MERET);
 	return 0;
 }
