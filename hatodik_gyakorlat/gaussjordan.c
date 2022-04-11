@@ -14,6 +14,18 @@ int main()
             scanf("%f",&A[i][j]);
         }
     }
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            printf("%f ",A[i][j]);
+        }
+        printf("\n");
+        
+    }
+    
+    
+    
     /* Now finding the elements of diagonal matrix */
     for(j=1; j<=n; j++)
     {
@@ -22,6 +34,7 @@ int main()
             if(i!=j)
             {
                 c=A[i][j]/A[j][j];
+                printf("%f",c);
                 for(k=1; k<=n+1; k++)
                 {
                     A[i][k]=A[i][k]-c*A[j][k];
