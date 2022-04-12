@@ -17,8 +17,6 @@ void solution( float a[N][N+1], int var )
             {
                 if ( i != k ){
                     a[i][j] = (a[k][k]*a[i][j])-(l*a[k][j]);
-                    //printf("%f=(%f*%f)-(%f*%f) hiba%d",a[i][j],a[k][k],a[i][j],l,a[k][j],i);
-                    //printf("pozicio: %d %d k:%d\n",i,j,k);
                 }
             }
             for (int i = 0; i < N; i++)
@@ -30,6 +28,7 @@ void solution( float a[N][N+1], int var )
                 printf("\n");
         
             }
+            printf("---------------------------------------\n");
             
         }
         printf("---------------------------------------\n");
@@ -54,6 +53,7 @@ void solution( float a[N][N+1], int var )
 }
 
 int main(){
+
     float matrix[N][N+1] = {{1,1,-1,7},{1,-1,2,3},{2,1,1,9}};
 
     float x[N];
@@ -67,6 +67,7 @@ int main(){
         printf("\n");
         
     }
+    printf("---------------------------------------\n");
     solution(matrix,3);
       
 

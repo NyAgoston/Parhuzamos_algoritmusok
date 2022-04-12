@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+<<<<<<< Updated upstream
 #include <pthread.h>
 
 #define N 3
@@ -72,4 +73,54 @@ int main(){
 
 
     return 0;
+=======
+
+#define N 3
+
+int main()
+{
+    float matrix[20][20];
+    float c,x[N+1];
+    for(int i = 1; i <= N; i++)
+    {
+        for(int j = 1; j <= (N + 1); j++)
+        {
+            printf(" A[%d][%d]:", i,j);
+            scanf("%f",&matrix[i][j]);
+        }
+    }
+
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j <= N; j++)
+        {
+            printf("%f ",matrix[i][j]);
+        }
+        printf("\n");
+        
+    }
+    for(int j=1; j<=N; j++)
+    {
+        for(int i=1; i<=N; i++)
+        {
+            if(i!=j)
+            {
+                c = matrix[i][j] / matrix[j][j];
+                printf("c:%f\n",c);
+                for(int k=1; k<=N + 1; k++)
+                {
+                    matrix[i][k] = matrix[i][k] - c * matrix[j][k];
+                }
+            }
+        }
+    }
+    printf("\nA megoldas:\n");
+    for(int l = 1; l <= N; l++)
+    {
+        x[l] = matrix[l][N+1] / matrix[l][l];
+        printf("\n x%d=%f\n",l,x[l]);
+    }  
+    
+    return(0);
+>>>>>>> Stashed changes
 }
