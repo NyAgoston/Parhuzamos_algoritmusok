@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <limits.h>
+#include <float.h>
 
-static int N = 509;
-
-void random(double A[N][N]){
+void randomfill(double **A,int N){
     for (int i = 0; i < N; i++)
     {
         
@@ -18,7 +16,7 @@ void random(double A[N][N]){
 
 }
 
-void print(double A[N][N]){
+void print(double **A,int N){
     for (int i = 0; i < N; i++)
     {
         
@@ -31,8 +29,8 @@ void print(double A[N][N]){
     }
 
 }
-double max(double B[]){
-    double max = INT_MIN;
+double max(double *B,int N){
+    double max = DBL_MIN;
     for (int i = 0; i < N; i++)
     {
         //printf("%d ",B[i]);
@@ -44,11 +42,10 @@ double max(double B[]){
     
 }
 
-void infnorm(double A[N][N]){
+void infnorm(double **A,int N){
     double B[N];
     double seged = 0;
     
-
     for (int i = 0; i < N; i++)
     {
         seged = 0;
@@ -63,17 +60,24 @@ void infnorm(double A[N][N]){
         
     }
 
-    printf("The matrixes infinity norm is: %lf\n",max(B));
+    printf("The matrixes infinity norm is: %lf\n",max(B,N));
     
 }
 
 int main(){
 
-    double A[N][N];
+    int N = 10000;
+
+    double **A = (double **)malloc(N*sizeof(double));
+    for (int i = 0; i < N; i++)
+    {
+        A[i] = (double *)malloc(N*sizeof(double));
+    }
+    
 
     srand(time(NULL));
 
-    random(A);
+    randomfill(A,N);
 
     //print(A);
 
@@ -82,13 +86,12 @@ int main(){
 
     start = clock();
 
-    infnorm(A);
+    infnorm(A,N);
 
     end = clock();
 
     time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     printf("Matrix size: %d, time taken: %lf",N,time_taken);
-
     return 0;
 }
