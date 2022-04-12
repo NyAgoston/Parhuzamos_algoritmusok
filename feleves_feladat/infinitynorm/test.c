@@ -3,9 +3,7 @@
 #include <time.h>
 #include <limits.h>
 
-static int N = 509;
-
-void random(double A[N][N]){
+void random(double **A,int N){
     for (int i = 0; i < N; i++)
     {
         
@@ -18,7 +16,7 @@ void random(double A[N][N]){
 
 }
 
-void print(double A[N][N]){
+void print(double **A,int N){
     for (int i = 0; i < N; i++)
     {
         
@@ -31,7 +29,7 @@ void print(double A[N][N]){
     }
 
 }
-double max(double B[]){
+double max(double *B,int N){
     double max = INT_MIN;
     for (int i = 0; i < N; i++)
     {
@@ -44,7 +42,7 @@ double max(double B[]){
     
 }
 
-void infnorm(double A[N][N]){
+void infnorm(double **A,int N){
     double B[N];
     double seged = 0;
     
@@ -63,17 +61,24 @@ void infnorm(double A[N][N]){
         
     }
 
-    printf("The matrixes infinity norm is: %lf\n",max(B));
+    printf("The matrixes infinity norm is: %lf\n",max(B,N));
     
 }
 
 int main(){
 
-    double A[N][N];
+    int N = 1000;
+
+    double **A = (double **)malloc(N*sizeof(double));
+    for (int i = 0; i < N; i++)
+    {
+        A[i] = (double **)malloc(N*sizeof(double));
+    }
+    
 
     srand(time(NULL));
 
-    random(A);
+    random(A,N);
 
     //print(A);
 
@@ -82,7 +87,7 @@ int main(){
 
     start = clock();
 
-    infnorm(A);
+    infnorm(A,N);
 
     end = clock();
 
