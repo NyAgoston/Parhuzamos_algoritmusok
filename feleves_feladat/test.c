@@ -1,142 +1,65 @@
 #include <stdio.h>
-#include <stdlib.h> 
-#include <pthread.h>
+#include <stdlib.h>
+#include <time.h>
 
-using namespace std;
+typedef struct Matrix {
+	int N;
+    int M;
+    double **data;
+} Matrix;
 
-typedef struct _ARGS
-{
-	int thread_count;
-	int thread_number;
+void alloc_matrix(Matrix *matrix,int N,int M){
+	matrix->N = N;
+	matrix->M = M;
+	matrix->data = (double **)malloc(matrix->N*sizeof(double));
+    for (int i = 0; i < matrix->M; i++)
+    {
+        matrix->data[i] = (double *)malloc(matrix->M*sizeof(double));
+    }
 
-	double * a;
-	double * b;
-	int n; 
+}
+void free_matrix(Matrix *matrix){
+	for (int i = 0; i < matrix->M; i++)
+    {
+        free(matrix->data[i]);
+    }
+    
+    free(matrix->data);
 
-	int rs; 
-	int re; 
-} ARGS;
-
-double getfulltime();
-
-void *work (void *ptr)
-{
-	ARGS * arg = (ARGS*) ptr;
-	
-	int n = arg->n;	
-
-	//int total_threads = arg->thread_count;
-	   
-	double tmp;
-	
-	int i, k, j;
-	
-	for (i = 0; i < n; i++)
-	{
-		if (i <= arg->re && i >= arg->rs)
-		{
-			tmp = arg->a[i*n + i];
-
-			for (k = i; k < n; k++)
-				arg->a[i*n + k] /= tmp;
-			arg->b[i] /= tmp;		  
-		}
-	
-		synchronize(arg->thread_count);
-		if (i > arg->re || i < arg->rs)
-		{
-			for (j = arg->rs; j <= arg->re; j++)
-			{
-				tmp = arg->a[j * n + i];
-				for (k = i; k < n; k++)
-					arg->a[j*n + k] -= arg->a[i*n + k]*tmp;
-				
-				arg->b[j] -= arg->b[i] * tmp;
-			}
-			
-		}
-		else
-		{
-			for (j = arg->rs; j < i; j++)
-			{
-				tmp = arg->a[j * n + i];
-				
-				for (k = i; k < n; k++)
-					arg->a[j*n + k] -= arg->a[i*n + k] * tmp;
-				arg->b[j] -= arg->b[i] * tmp;
-			}
-			for (j = i + 1; j <= arg->re; j++)
-			{
-				tmp = arg->a[j * n + i];
-				for (k = i; k < n; k++)
-					arg->a[j*n + k] -= arg->a[i*n + k] * tmp;
-				arg->b[j] -= arg->b[i] * tmp;
-			}
-		}
-		//synchronize(arg->thread_count);
-	}
-	
-	return NULL;
+}
+void randomfill_matrix(Matrix *matrix){
+    for (int i = 0; i < matrix->N; i++)
+    {        
+        for (int k = 0; k < matrix->M; k++)
+        {
+            matrix->data[i][k] = rand() % 100;           
+        }   
+    }
+}
+void print_matrix(const Matrix *matrix){
+    for (int i = 0; i < matrix->N; i++)
+    {        
+        for (int k = 0; k < matrix->M; k++)
+        {
+            printf("%lf ",matrix->data[i][k]);
+        }
+        printf("\n");        
+    }
 }
 
-double solve_system(int n, double* A, double* b, double**x, int fullthr)
-{
-  
-	pthread_t *threads;
-	
-	ARGS *args;
-	
-	int rowPerthr = n/fullthr;
-	
-	
-	if (!(threads = (pthread_t*) malloc(fullthr * sizeof(pthread_t))))
-	{
-		cout<<"Thread allocation error";
-		return 1;
-	}
-    
-	if (!(args = (ARGS*) malloc (fullthr * sizeof(ARGS))))
-	{
-		cout<<"ARGS allocation error";
-		return 1;
-	}
-	
-	for (int i = 0; i < fullthr; i++)
-	{
-		args[i].thread_number = i;
-		args[i].thread_count = fullthr;
-		args[i].n = n;
-		args[i].a = A;
-		args[i].b = b;
-		if(i == fullthr - 1)
-		{
-		    args[i].rs = i*rowPerthr;
-		    args[i].re = n - 1;
-		}
-		else
-		{
-		    args[i].rs = i*rowPerthr;
-		    args[i].re = (i + 1)*rowPerthr - 1;
-		  
-		}
- 	}
-    
-		
-	int i;	
-		
-	double t = getfulltime();
-	
-	for (i = 0; i < fullthr; i++)
-		pthread_create(threads + i, 0, work, args + i);
-		
-	for (i = 0; i < fullthr; i++)
-		pthread_join(threads[i], NULL);
-	
-			
-	t = getfulltime() - t;
+int main(){
 
-	*x = b;
-	free(threads);
-	free(args);
-	return t;
+	Matrix matrix;
+
+	alloc_matrix(&matrix,2,2);
+ 	
+	srand(time(NULL));
+
+	randomfill_matrix(&matrix);
+    
+	print_matrix(&matrix);
+
+	free_matrix(&matrix);
+
+	return 0;
 }

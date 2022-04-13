@@ -93,5 +93,13 @@ int main(){
     time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     printf("Matrix size: %d, time taken: %lf",N,time_taken);
+
+    
+    for (int i = 0; i < N; i++)
+    {
+        free(A[i]);
+    }
+    
+    free(A);
     return 0;
 }
