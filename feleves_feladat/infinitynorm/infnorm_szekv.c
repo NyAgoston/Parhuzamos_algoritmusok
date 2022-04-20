@@ -2,47 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <float.h>
+#include "matrix_operations.h"
 
-void randomfill(double **A,int N){
-    for (int i = 0; i < N; i++)
-    {
-        
-        for (int k = 0; k < N; k++)
-        {
-            A[i][k] = rand() % 100;           
-        }
-        
-    }
-
-}
-
-void print(double **A,int N){
-    for (int i = 0; i < N; i++)
-    {
-        
-        for (int k = 0; k < N; k++)
-        {
-            printf("%lf ",A[i][k]);
-        }
-        printf("\n");
-        
-    }
-
-}
-double max(double *B,int N){
-    double max = DBL_MIN;
-    for (int i = 0; i < N; i++)
-    {
-        //printf("%d ",B[i]);
-        if(B[i] > max){
-            max = B[i];
-        }
-    }
-    return max;
-    
-}
-
-void infnorm(double **A,int N){
+void infnorm(Matrix *matrix){
+    int N = matrix->N;
     double B[N];
     double seged = 0;
     
@@ -51,7 +14,7 @@ void infnorm(double **A,int N){
         seged = 0;
         for (int j = 0; j < N; j++)
         {
-            seged += abs(A[i][j]);
+            seged += abs(matrix->data[i][j]);
             //printf("Hozzadava: %d ",A[i][j]);
         }
         B[i] = seged;
@@ -66,27 +29,24 @@ void infnorm(double **A,int N){
 
 int main(){
 
-    int N = 10000;
+    Matrix matrix;
 
-    double **A = (double **)malloc(N*sizeof(double));
-    for (int i = 0; i < N; i++)
-    {
-        A[i] = (double *)malloc(N*sizeof(double));
-    }
-    
+    alloc_matrix(&matrix,14000,14000);
+
+    int N = matrix.N;
 
     srand(time(NULL));
 
-    randomfill(A,N);
+    randomfill_matrix(&matrix);
 
-    //print(A);
+    //print_matrix(&matrix);
 
     clock_t start,end;
     double time_taken;
 
     start = clock();
 
-    infnorm(A,N);
+    infnorm(&matrix);
 
     end = clock();
 
@@ -94,12 +54,16 @@ int main(){
 
     printf("Matrix size: %d, time taken: %lf",N,time_taken);
 
-    
-    for (int i = 0; i < N; i++)
-    {
-        free(A[i]);
-    }
-    
-    free(A);
+    free_matrix(&matrix);
+
+    //File that contains data: matrix size, time_taken
+
+    FILE *fp;
+    fp = fopen("data.csv","a+");
+
+    fprintf(fp,"%d %d %lf\n",0,N,time_taken);
+
+    fclose(fp);
+
     return 0;
 }

@@ -1,76 +1,69 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include "matrix_operations.h"
 
-#define N 3
-
-void solution( float a[N][N+1], int var )
+void gauss_jordan_solver(Matrix *matrix)
 {
-    int k, i, l, j;
+    int k, i, j;
+
+    double l;
+
+    int var = matrix->N;
  
     for ( k = 0;k < var;k++ )
     {
         for ( i = 0;i <= var;i++ )
         {
-            l = a[ i ][ k ];
+            l = matrix->data[ i ][ k ];
  
             for ( j = 0;j <= var;j++ )
             {
                 if ( i != k ){
-                    a[i][j] = (a[k][k]*a[i][j])-(l*a[k][j]);
+                    matrix->data[i][j] = (matrix->data[k][k]*matrix->data[i][j])-(l*matrix->data[k][j]);
                 }
             }
-            for (int i = 0; i < N; i++)
-            {
-                for (int j = 0; j <= N; j++)
-                {
-                    printf("%f ",a[i][j]);
-                }
-                printf("\n");
-        
-            }
-            printf("---------------------------------------\n");
             
         }
-        printf("---------------------------------------\n");
-    }
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j <= N; j++)
-        {
-            printf("%f ",a[i][j]);
-        }
-        printf("\n");
         
     }
- 
     printf( "\nSolutions:" );
  
-    for ( i = 0;i < var;i++ )
+    for ( i = 0;i < matrix->N;i++ )
     {
-        printf( "\nTHE VALUE OF x%d IS %f\n", i + 1,a[ i ][ var ] /a[ i ][ i ] );
+        printf( "\nTHE VALUE OF x%d IS %lf\n", i + 1,matrix->data[i][var] /matrix->data[i][i]);
     }
  
 }
 
 int main(){
 
-    float matrix[N][N+1] = {{1,1,-1,7},{1,-1,2,3},{2,1,1,9}};
+    Matrix matrix;
 
-    float x[N];
+    alloc_matrix(&matrix,10,11);
 
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j <= N; j++)
-        {
-            printf("%f ",matrix[i][j]);
-        }
-        printf("\n");
-        
-    }
-    printf("---------------------------------------\n");
-    solution(matrix,3);
-      
+    int N = matrix.N;
 
+    srand(time(NULL));
+
+    randomfill_matrix(&matrix);
+    
+    print_matrix(&matrix);
+
+    clock_t start,end;
+    double time_taken;
+
+    start = clock();
+
+    gauss_jordan_solver(&matrix);
+
+    end = clock();
+
+    time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    printf("Matrix size: %d, time taken: %lf",N,time_taken);
+
+    free_matrix(&matrix);
 
     return 0;
 }
