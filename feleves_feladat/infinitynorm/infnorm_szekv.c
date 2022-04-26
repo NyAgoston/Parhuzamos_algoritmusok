@@ -1,8 +1,8 @@
+#include "matrix_operations.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <float.h>
-#include "matrix_operations.h"
 
 void infnorm(Matrix *matrix){
     int N = matrix->N;

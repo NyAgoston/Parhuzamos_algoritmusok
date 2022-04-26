@@ -7,12 +7,13 @@
 
 #define MAX_NO_OF_THREADS 4
 
-static double solutions[16000];
 static Matrix matrix;
+static double maxes[];
 
 typedef struct arg_data {
     int thread_number;
     int N;
+    double solutions[];
 } arg_data;
 
 void* infnorm(void* arg){
@@ -25,6 +26,7 @@ void* infnorm(void* arg){
     printf("Here we will sum %d to %d\n", startpart, endpart - 1);
 
     int N = current_thread_data->N;
+    alloc_dynamic_array(current_thread_data->solutions,endpart);
 
     //double B[N/MAX_NO_OF_THREADS];
     double seged = 0;
@@ -37,15 +39,17 @@ void* infnorm(void* arg){
             seged += abs(matrix.data[i][j]);
         }
         //B[i] = seged;
-        solutions[i] = seged;
-        
+        current_thread_data->solutions[i] = seged;
     }
+    maxes[current_thread_data->thread_number] = max(current_thread_data->solutions,endpart);
 
 }
 
 int main(){
 
-    alloc_matrix(&matrix,16000,16000);
+    int size = 10000;
+
+    alloc_matrix(&matrix,size,size);
 
     int N = matrix.N;
  
@@ -80,7 +84,7 @@ int main(){
         pthread_join(id[i - 1], NULL);
     }
 
-    printf("The matrixes infinity norm is: %lf\n",max(solutions,N));
+    printf("The matrixes infinity norm is: %lf\n",max(maxes,N));
 
     end = clock();
 
