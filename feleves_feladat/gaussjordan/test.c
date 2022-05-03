@@ -1,52 +1,89 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <math.h>
 #include <time.h>
 #include <omp.h>
+#include "matrix_operations.h"
 
-int main(){
-  
-  gauss();
+volatile double *B,*X;
+static Matrix A;
+
+void allocate_matrixes(int size){
+  for (int i = 0; i < size; i++)
+  {  
+    B = (double *)malloc(size*sizeof(double));
+    X = (double *)malloc(size*sizeof(double));
+  }
+}
+void initialize_matrixes(int size){
+  for (int i = 0; i < size; i++)
+  {
+    B[i] = ((double)rand()*(100-10))/(double)RAND_MAX + 10;
+    X[i] = 0.0;
+  }
 }
 
-/* ------------------ Above Was Provided --------------------- */
-
-/****** You will replace this routine with your own parallel version *******/
-/* Provided global variables are MAXN, N, A[][], B[], and X[],
- * defined in the beginning of this code.  X[] is initialized to zeros.
- */
-void gauss() {
-  int norm, row, col;  /* Normalization row, and zeroing
-			* element row and col */
+void gauss(int N) {
+  int norm, row, col;  
+		
   float multiplier;
 
   printf("Computing Serially.\n");
 
-  /* Gaussian elimination */
-
   for (norm = 0; norm < N - 1; norm++) {
     #pragma omp parallel for shared(A, B) private(multiplier,row,col)
     for (row = norm + 1; row < N; row++) {
-      multiplier = A[row][norm] / A[norm][norm];
+      multiplier = A.data[row][norm] / A.data[norm][norm];
       for (col = norm; col < N; col++) {
-	         A[row][col] -= A[norm][col] * multiplier;
+	         A.data[row][col] -= A.data[norm][col] * multiplier;
       }
       B[row] -= B[norm] * multiplier;
     }
   }
-  /* (Diagonal elements are not normalized to 1.  This is treated in back
-   * substitution.)
-   */
-
-
-  /* Back substitution */
+  
+  
   for (row = N - 1; row >= 0; row--) {
     X[row] = B[row];
     for (col = N-1; col > row; col--) {
-      X[row] -= A[row][col] * X[col];
+      X[row] -= A.data[row][col] * X[col];
     }
-    X[row] /= A[row][row];
+    X[row] /= A.data[row][row];
   }
+  /*
+  for (int i = 0; i < N; i++)
+  {
+    printf( "\nTHE VALUE OF x%d IS %lf\n",i + 1,X[i]);
+  }*/
+  
+}
+
+int main(){
+
+  int size = 2000;
+
+  alloc_matrix(&A,size,size);
+
+  srand(time(NULL));
+
+  randomfill_matrix(&A);
+
+  allocate_matrixes(size);
+
+  initialize_matrixes(size);
+
+  clock_t start,end;
+  double time_taken;
+  
+  start = clock();
+
+  gauss(size);
+
+  end = clock();
+
+  time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+  printf("Matrix size: %d, time taken: %lf",size,time_taken);
+
+  return 0;
 }

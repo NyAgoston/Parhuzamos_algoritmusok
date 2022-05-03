@@ -1,80 +1,89 @@
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
+#include <omp.h>
 #include "matrix_operations.h"
-#include "omp.h"
+
+volatile double *B,*X;
+static Matrix A;
+
+void allocate_matrixes(int size){
+  for (int i = 0; i < size; i++)
+  {  
+    B = (double *)malloc(size*sizeof(double));
+    X = (double *)malloc(size*sizeof(double));
+  }
+}
+void initialize_matrixes(int size){
+  for (int i = 0; i < size; i++)
+  {
+    B[i] = ((double)rand()*(100-10))/(double)RAND_MAX + 10;
+    X[i] = 0.0;
+  }
+}
+
+void gauss(int N) {
+  int norm, row, col;  
+		
+  float multiplier;
+
+  printf("Computing Serially.\n");
+
+  for (norm = 0; norm < N - 1; norm++) {
+    #pragma omp parallel for shared(A, B) private(multiplier,row,col)
+    for (row = norm + 1; row < N; row++) {
+      multiplier = A.data[row][norm] / A.data[norm][norm];
+      for (col = norm; col < N; col++) {
+	         A.data[row][col] -= A.data[norm][col] * multiplier;
+      }
+      B[row] -= B[norm] * multiplier;
+    }
+  }
+  
+  
+  for (row = N - 1; row >= 0; row--) {
+    X[row] = B[row];
+    for (col = N-1; col > row; col--) {
+      X[row] -= A.data[row][col] * X[col];
+    }
+    X[row] /= A.data[row][row];
+  }
+  /*
+  for (int i = 0; i < N; i++)
+  {
+    printf( "\nTHE VALUE OF x%d IS %lf\n",i + 1,X[i]);
+  }*/
+  
+}
 
 int main(){
 
-    Matrix matrix;
+  int size = 2000;
 
-    alloc_matrix(&matrix,10,11);
+  alloc_matrix(&A,size,size);
 
-    int N = matrix.N;
+  srand(time(NULL));
 
-    double X[N];
+  randomfill_matrix(&A);
 
+  allocate_matrixes(size);
 
-    srand(time(NULL));
+  initialize_matrixes(size);
 
-    randomfill_matrix(&matrix);
-    
-    //print_matrix(&matrix);
-    int k,i,j,row;
-    #pragma omp paralell private(k,i,j,row) shared(matrix)
-        double my_rank = omp_get_thread_num();
-        double bsize = N/omp_get_num_threads();
-        if (my_rank != 0)
-        {
-            for (k = my_rank * bsize; k <= (my_rank * bsize) + bsize; k++)
-            {
-                row = Get(my_rank);
-                Put(my_rank + 1,row);
-                for (i = 0; i <= k + bsize; i++)
-                {
-                    if(row != i){
-                        for (j = 0; i <= N + 1; i++)
-                        {
-                            matrix.data[i][j] = (matrix.data[i][row]/matrix.data[row][row]) * matrix.data[row][j];
-                        }
-                        
-                    }
-                }
-                
-            }
-            
-        }else{
-            for (k = (my_rank * bsize); k <= (my_rank * bsize) + bsize; k++)
-            {
-                Put(my_rank + 1,k);
-                for (i = 0; i <= k + bsize; i++)
-                {
-                    if (k != i)
-                    {
-                        for (j = k + 1; j <= N + 1; j++)
-                        {
-                            matrix.data[i][j] -= (matrix.data[i][k]/matrix.data[k][k]) * matrix.data[k][j];
-                        }
-                        
-                    }
-                    
-                }
-                
-            }
-            
-        }
-        
-    
-    
-    
-    /*
-    for (int j = 0; j <= N-1; j++)
-    {
-       printf( "\nTHE VALUE OF x%d IS %lf\n",j + 1,X[j]);
-    }
-    */
+  clock_t start,end;
+  double time_taken;
+  
+  start = clock();
 
-    free_matrix(&matrix);
+  gauss(size);
 
-    return 0;
+  end = clock();
+
+  time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+  printf("Matrix size: %d, time taken: %lf",size,time_taken);
+
+  return 0;
 }
