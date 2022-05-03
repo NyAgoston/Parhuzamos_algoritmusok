@@ -1,17 +1,19 @@
 from random import *
 import time
+import numpy as np
 #numpy
 #pypy
 
 solutions = []
-       
-N = 10000
-matrix = [[randint(1,100) for i in range(N)] for j in range(N)]
+sum = 0;
+N = 100
+matrix = np.random.rand(N,N)
 start = time.time()
-for i in range(N):
-    for k in range(N):
-        sum += abs(matrix[i][k])
-        solutions.append(sum);
+for i in matrix:
+    for k in matrix:
+        sum = sum + abs(k)
+
+    solutions.append(sum);
         
 solution = max(solutions)
 

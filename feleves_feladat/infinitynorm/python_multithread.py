@@ -1,6 +1,7 @@
 import threading
 from random import *
 import time
+import numpy as np
 
 def infnorm(matrix,x):
     endpart = x * (N / num_of_threads)
@@ -19,7 +20,7 @@ if __name__ == "__main__":
     solutions = []
        
     N = 10000
-    matrix = [[randint(1,100) for i in range(N)] for j in range(N)]
+    matrix = np.random.rand(N,N)
     num_of_threads = 5
     threads = []
     start = time.time()
