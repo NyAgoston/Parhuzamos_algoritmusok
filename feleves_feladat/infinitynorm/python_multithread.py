@@ -18,7 +18,7 @@ if __name__ == "__main__":
    
     solutions = []
        
-    N = 100
+    N = 10000
     matrix = [[randint(1,100) for i in range(N)] for j in range(N)]
     num_of_threads = 5
     threads = []

@@ -6,7 +6,7 @@
 
 void infnorm(Matrix *matrix){
     int N = matrix->N;
-    double B[N];
+    double* B = (double *)malloc(N*sizeof(double));
     double seged = 0;
     
     for (int i = 0; i < N; i++)
@@ -15,12 +15,8 @@ void infnorm(Matrix *matrix){
         for (int j = 0; j < N; j++)
         {
             seged += abs(matrix->data[i][j]);
-            //printf("Hozzadava: %d ",A[i][j]);
         }
         B[i] = seged;
-        //printf("\n");
-        //printf("Eredmen: %d ",B[i]);
-        
     }
 
     printf("The matrixes infinity norm is: %lf\n",max(B,N));
@@ -31,7 +27,9 @@ int main(){
 
     Matrix matrix;
 
-    alloc_matrix(&matrix,14000,14000);
+    int size = 17000;
+
+    alloc_matrix(&matrix,size,size);
 
     int N = matrix.N;
 

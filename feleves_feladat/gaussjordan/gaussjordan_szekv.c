@@ -3,65 +3,63 @@
 #include <time.h>
 #include "matrix_operations.h"
 
-void gauss_jordan_solver(Matrix *matrix)
-{
-    int k, i, j;
+void gauss_jordan_solver(Matrix *matrix){
+    int N = matrix->N;
 
-    double l;
-
-    int var = matrix->N;
- 
-    for ( k = 0;k < var;k++ )
+    double *X = (double *)malloc(matrix->N*sizeof(double));
+    for (int k = 0; k <= N-1; k++)
     {
-        for ( i = 0;i <= var;i++ )
+        for (int i = 0; i <= N-1; i++)
         {
-            l = matrix->data[ i ][ k ];
- 
-            for ( j = 0;j <= var;j++ )
+            if (k != i)
             {
-                if ( i != k ){
-                    matrix->data[i][j] = (matrix->data[k][k]*matrix->data[i][j])-(l*matrix->data[k][j]);
+                for (int j = k +1 ; j <= N; j++)
+                {
+                    matrix->data[i][j] = matrix->data[i][j] - (matrix->data[i][k] / matrix->data[k][k]) * matrix->data[k][j];
                 }
+                
             }
             
         }
         
     }
-    printf( "\nSolutions:" );
- 
-    for ( i = 0;i < matrix->N;i++ )
+    for (int i = 0; i <= N-1; i++)
     {
-        printf( "\nTHE VALUE OF x%d IS %lf\n", i + 1,matrix->data[i][var] /matrix->data[i][i]);
+        X[i] = matrix->data[i][N] / matrix->data[i][i];
     }
- 
-}
 
+    for (int j = 0; j <= N-1; j++)
+    {
+       //printf( "\nTHE VALUE OF x%d IS %lf\n",j + 1,X[j]);
+    }
+}
 int main(){
 
     Matrix matrix;
 
-    alloc_matrix(&matrix,10,11);
+    alloc_matrix(&matrix,1000,1001);
 
     int N = matrix.N;
+
+    double X[N];
 
     srand(time(NULL));
 
     randomfill_matrix(&matrix);
     
-    print_matrix(&matrix);
-
+    //print_matrix(&matrix);
     clock_t start,end;
     double time_taken;
 
     start = clock();
 
     gauss_jordan_solver(&matrix);
-
     end = clock();
 
     time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     printf("Matrix size: %d, time taken: %lf",N,time_taken);
+    
 
     free_matrix(&matrix);
 
