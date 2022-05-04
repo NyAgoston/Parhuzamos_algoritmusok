@@ -37,7 +37,7 @@ int main(){
 
     Matrix matrix;
 
-    alloc_matrix(&matrix,1000,1001);
+    alloc_matrix(&matrix,100,101);
 
     int N = matrix.N;
 

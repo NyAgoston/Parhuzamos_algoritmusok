@@ -24,12 +24,10 @@ void initialize_matrixes(int size){
   }
 }
 
-void gauss(int N) {
+void gauss_jordan_omp(int N) {
   int norm, row, col;  
 		
   float multiplier;
-
-  printf("Computing Serially.\n");
 
   for (norm = 0; norm < N - 1; norm++) {
     #pragma omp parallel for shared(A, B) private(multiplier,row,col)
@@ -60,7 +58,7 @@ void gauss(int N) {
 
 int main(){
 
-  int size = 2000;
+  int size = 10;
 
   alloc_matrix(&A,size,size);
 
@@ -77,13 +75,14 @@ int main(){
   
   start = clock();
 
-  gauss(size);
+  gauss_jordan_omp(size);
 
   end = clock();
 
   time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
   printf("Matrix size: %d, time taken: %lf",size,time_taken);
+  print_matrix(&A);
 
   return 0;
 }
