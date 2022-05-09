@@ -1,5 +1,5 @@
 import threading
-from random import *
+import random
 import time
 import numpy as np
 
@@ -25,6 +25,7 @@ if __name__ == "__main__":
         solutions = []
         
         N = measure
+        #matrix = [[random.random() for i in range(N)] for j in range(N)]
         matrix = np.random.rand(N,N)
         
         threads = []
