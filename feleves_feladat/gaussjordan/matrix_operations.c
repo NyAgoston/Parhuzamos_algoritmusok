@@ -62,3 +62,5 @@ double max(double *B,int N){
 void alloc_dynamic_array(double *array,int N){
     array = (double *)malloc(N*sizeof(double));
 }
+
+    

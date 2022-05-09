@@ -1,88 +1,90 @@
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <time.h>
-#include <omp.h>
 #include "matrix_operations.h"
+#include "omp.h"
 
-volatile double *B,*X;
-static Matrix A;
+static Matrix matrix;
+volatile double *X;
 
-void allocate_matrixes(int size){
-  for (int i = 0; i < size; i++)
-  {  
-    B = (double *)malloc(size*sizeof(double));
-    X = (double *)malloc(size*sizeof(double));
-  }
-}
-void initialize_matrixes(int size){
-  for (int i = 0; i < size; i++)
-  {
-    B[i] = ((double)rand()*(100-10))/(double)RAND_MAX + 10;
-    X[i] = 0.0;
-  }
-}
+void gauss_jordan_solver(){
+    int N = matrix.N;
+    int i,j,k;
 
-void gauss_jordan_omp(int N) {
-  int norm, row, col;  
-		
-  float multiplier;
-
-  for (norm = 0; norm < N - 1; norm++) {
-    #pragma omp parallel for shared(A, B) private(multiplier,row,col)
-    for (row = norm + 1; row < N; row++) {
-      multiplier = A.data[row][norm] / A.data[norm][norm];
-      for (col = norm; col < N; col++) {
-	         A.data[row][col] -= A.data[norm][col] * multiplier;
-      }
-      B[row] -= B[norm] * multiplier;
+    #pragma omp parallel for shared(matrix, X) private(i,j,k)
+    for (k = 0; k <= N-1; k++)
+    {
+        for (i = 0; i <= N-1; i++)
+        {
+            if (k != i)
+            {
+                for (j = k +1 ; j <= N; j++)
+                {
+                    matrix.data[i][j] = matrix.data[i][j] - (matrix.data[i][k] / matrix.data[k][k]) * matrix.data[k][j];
+                }
+                
+            }
+            
+        }
+        
     }
-  }
-  
-  
-  for (row = N - 1; row >= 0; row--) {
-    X[row] = B[row];
-    for (col = N-1; col > row; col--) {
-      X[row] -= A.data[row][col] * X[col];
+    for (int i = 0; i <= N-1; i++)
+    {
+        X[i] = matrix.data[i][N] / matrix.data[i][i];
     }
-    X[row] /= A.data[row][row];
-  }
-  /*
-  for (int i = 0; i < N; i++)
-  {
-    printf( "\nTHE VALUE OF x%d IS %lf\n",i + 1,X[i]);
-  }*/
-  
-}
 
+    for (int j = 0; j <= N-1; j++)
+    {
+       //printf( "\nTHE VALUE OF x%d IS %lf\n",j + 1,X[j]);
+    }
+}
 int main(){
 
-  int size = 10;
+    int range = 30;
 
-  alloc_matrix(&A,size,size);
+    int measures[30] = {100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000};
 
-  srand(time(NULL));
+    for (int i = 0; i < range; i++)
+    {
+        int col = measures[i];
 
-  randomfill_matrix(&A);
+        int row = col + 1;
 
-  allocate_matrixes(size);
+        alloc_matrix(&matrix,col,row);
 
-  initialize_matrixes(size);
+        X = (double *)malloc(matrix.N*sizeof(double));
 
-  clock_t start,end;
-  double time_taken;
-  
-  start = clock();
+        int N = matrix.N;
 
-  gauss_jordan_omp(size);
+        double X[N];
 
-  end = clock();
+        srand(time(NULL));
 
-  time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+        randomfill_matrix(&matrix);
+        
+        //print_matrix(&matrix);
+        clock_t start,end;
+        double time_taken;
 
-  printf("Matrix size: %d, time taken: %lf",size,time_taken);
-  print_matrix(&A);
+        start = clock();
 
-  return 0;
+        gauss_jordan_solver();
+        end = clock();
+
+        time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+        printf("Matrix size: %d, time taken: %lf\n",N,time_taken);
+
+        FILE *fp;
+        fp = fopen("data.csv","a");
+
+        fprintf(fp,"%d %d %lf\n",0,N,time_taken);
+
+        fclose(fp);
+
+        free_matrix(&matrix);
+        free(X);
+    }
+
+    return 0;
 }

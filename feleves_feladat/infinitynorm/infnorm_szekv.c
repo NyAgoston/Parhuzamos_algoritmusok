@@ -20,48 +20,56 @@ void infnorm(Matrix *matrix){
     }
 
     printf("The matrixes infinity norm is: %lf\n",max(B,N));
+    free(B);
     
 }
 
 int main(){
 
-    Matrix matrix;
+    int range = 39;
 
-    int size = 17000;
+    int measures[39] = {100,200,300,400,500,600,700,800,900,1000,1500,2000,2500,3000,3500,4000,4500,5000,5500,6000,6500,7000,7500,8000,8500,9000,9500,10000,10500,11000,11500,12000,12500,13000,13500,14000,14500,15000,15500};
 
-    alloc_matrix(&matrix,size,size);
+    for (int i = 0; i < range; i++)
+    {
+        Matrix matrix;
 
-    int N = matrix.N;
+        int size = measures[i];
 
-    srand(time(NULL));
+        alloc_matrix(&matrix,size,size);
 
-    randomfill_matrix(&matrix);
+        int N = matrix.N;
 
-    //print_matrix(&matrix);
+        srand(time(NULL));
 
-    clock_t start,end;
-    double time_taken;
+        randomfill_matrix(&matrix);
 
-    start = clock();
+        //print_matrix(&matrix);
 
-    infnorm(&matrix);
+        clock_t start,end;
+        double time_taken;
 
-    end = clock();
+        start = clock();
 
-    time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+        infnorm(&matrix);
 
-    printf("Matrix size: %d, time taken: %lf",N,time_taken);
+        end = clock();
 
-    free_matrix(&matrix);
+        time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
 
-    //File that contains data: matrix size, time_taken
+        printf("Matrix size: %d, time taken: %lf\n",N,time_taken);
 
-    FILE *fp;
-    fp = fopen("data.csv","a+");
+        //File that contains data: matrix size, time_taken
 
-    fprintf(fp,"%d %d %lf\n",0,N,time_taken);
+        FILE *fp;
+        fp = fopen("data.csv","a+");
 
-    fclose(fp);
+        fprintf(fp,"%d %d %lf\n",0,N,time_taken);
+
+        fclose(fp);
+
+        free_matrix(&matrix);
+    }
 
     return 0;
 }

@@ -16,36 +16,38 @@ def infnorm(matrix,x):
    
 if __name__ == "__main__":
     global solutions
-   
-    solutions = []
-       
-    N = 10000
-    matrix = np.random.rand(N,N)
-    num_of_threads = 5
-    threads = []
-    start = time.time()
 
-    t1 = threading.Thread(target=infnorm, args=(matrix,1))
-    t2 = threading.Thread(target=infnorm, args=(matrix,2))
-    t3 = threading.Thread(target=infnorm, args=(matrix,3))
-    t4 = threading.Thread(target=infnorm, args=(matrix,4))
-    t5 = threading.Thread(target=infnorm, args=(matrix,5))
-    threads.append(t1)
-    threads.append(t2)
-    threads.append(t3)
-    threads.append(t4)
-    threads.append(t5)
-
-    for i in range(num_of_threads):
-        threads[i].start()
+    measures = {100,200,300,400,500,600,700,800,900,1000,1500,2000,2500,3000,3500,4000,4500,5000,5500,6000,6500,7000,7500,8000,8500,9000,9500,10000,10500,11000,11500,12000,12500,13000,13500,14000,14500,15000,15500}
+    num_of_threads = 4
     
-    for i in range(num_of_threads):
-        threads[i].join()
 
-    solution = max(solutions)
-    end = time.time()
+    for measure in measures:
+        solutions = []
+        
+        N = measure
+        matrix = np.random.rand(N,N)
+        
+        threads = []
+        start = time.time()
 
-    print("The matrixes infinit norm is: ",solution) 
-    print("Elapsed time:",end - start)
+        for i in range(num_of_threads):
+            threads.append(threading.Thread(target=infnorm, args=(matrix,i + 1)))
+            threads[i].start()    
+        
+        for i in range(num_of_threads):
+            threads[i].join()
 
-    print("Done!")
+        solution = max(solutions)
+        end = time.time()
+
+        #print("The matrixes infinit norm is: ",solution) 
+        print("Matrix size:",measure,"Elapsed time:",end - start)
+
+        fo = open("python.csv","a")
+
+        fo.write("1 "+str(measure)+" "+str(end - start)+"\n")
+
+
+        fo.close()
+
+        del solution
