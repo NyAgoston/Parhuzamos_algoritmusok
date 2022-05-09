@@ -13,3 +13,5 @@
 - Kevés elemszámnál megfigyelhető hogy nem éri meg túl sok threadet létrehozni mivel ez időveszteséghez vezet, viszont minnél nagyobb a mátrix mérete annál hatékonyabb több szállal dolgozni. A kisebb elemű méréseket a "few_oc.jpg" tartalmazza, a nagyobb méretűeket pedig "infnorm_oc.jpg".
 - A pythonban megvalósított multithreading nagyon lassúnak bizonyult, igen magas időkülömbségek jöttek ki. A grafikon a mérésekről: "python_c.jpg".
 - Ellenben a pypy fordítót használva a c pthread-hez hasonló adatokat kapunk. Grafikon: "python_pypy".
+
+-A fileok a "feleves_feladat" mappában találhatóak meg. A "gaussjordan" mappában "data.csv" néven találhatóak a mérési adatok. Az "infinitynorm" mappában pedig: "data.csv" az összes mért adatot, "python.csv" a pythonban és pypy-ban mért összehasonlítást.
